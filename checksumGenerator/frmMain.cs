@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -39,7 +40,7 @@ namespace checksumGenerator
                     }
                     else // Begin multiselect files
                     {
-                        string message = "It looks like you selected multiple files.\nThis program is able to multi-generate checksums of the selected files\nand dump them into a file\n\nDo you want to continue?";
+                        string message = "It looks like you selected multiple files.\nThis program is able to multi-generate checksums of the selected files and dump them into a file\n\nDo you want to continue?";
                         string title = "Multiselect found!";
                         MessageBoxButtons buttons = MessageBoxButtons.YesNo;
                         DialogResult result = MessageBox.Show(message, title, buttons, MessageBoxIcon.Warning);
@@ -64,11 +65,27 @@ namespace checksumGenerator
                                 }
                             }
 
+                            // Done message
+                            message = "Done!\n\nDo you want to open the file?";
+                            title = "Task Done!";
+                            buttons = MessageBoxButtons.YesNo;
+                            result = MessageBox.Show(message, title, buttons, MessageBoxIcon.Question);
+                            if(result == DialogResult.Yes)
+                            {
+                                // open log file with windows notepad
+                                Process.Start("notepad", "checksumdump.txt");
+                                tbMD5Hash.Text = "";
+                                tbSha256Hash.Text = "";
+                            }
+                            else
+                            {
+                                // Path message
+                                message = "The file is located under: " + System.IO.Path.GetDirectoryName(Application.ExecutablePath + "checksumdump.txt"); ;
+                                title = "Information!";
+                                buttons = MessageBoxButtons.OK;
+                                result = MessageBox.Show(message, title, buttons, MessageBoxIcon.Information);
+                            }
                         }
-
-
-
-
                     }
                 }
 
