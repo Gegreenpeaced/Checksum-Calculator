@@ -1,8 +1,8 @@
 ﻿using System;
+using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Forms;
-using System.IO;
 
 namespace checksumGenerator
 {
@@ -25,57 +25,54 @@ namespace checksumGenerator
 
                 // open file dialog
                 OpenFileDialog ofd = new OpenFileDialog();
-                //ofd.Multiselect = true;
+                ofd.Multiselect = true;
                 ofd.Filter = "All files (*.*)|*.*";
                 ofd.Title = "Select a file";
-                if (ofd.FileNames.Length == 1)
+                if (ofd.ShowDialog() == DialogResult.OK)
                 {
-                    if (ofd.ShowDialog() == DialogResult.OK)
+                    if (ofd.FileNames.Length == 1)
                     {
-                        using (MD5 md5 = MD5.Create())
+                        tbMD5Hash.Text = GetMd5Hash(ofd.FileName);
+
+                        tbSha256Hash.Text = Getsha256Hash(ofd.FileName);
+
+                    }
+                    else // Begin multiselect files
+                    {
+                        string message = "It looks like you selected multiple files.\nThis program is able to multi-generate checksums of the selected files\nand dump them into a file\n\nDo you want to continue?";
+                        string title = "Multiselect found!";
+                        MessageBoxButtons buttons = MessageBoxButtons.YesNo;
+                        DialogResult result = MessageBox.Show(message, title, buttons, MessageBoxIcon.Warning);
+                        if (result == DialogResult.Yes)
                         {
-                            // read file
-                            byte[] file = System.IO.File.ReadAllBytes(ofd.FileName);
-                            // generate hash
-                            string md5hash = GetMd5Hash(md5, file);
-                            // display hash
-                            tbMD5Hash.Text = md5hash;
+                            multiselect = true;
+                            tbMD5Hash.Enabled = false;
+                            tbSha256Hash.Enabled = false;
+
+                            // Add all selected files to list
+                            String[] fileNames = ofd.FileNames;
+
+                            //create tmp file named "checksumdump.txt"
+                            using (StreamWriter sw = new StreamWriter("checksumdump.txt"))
+                            {
+                                sw.WriteLine("Filename | MD5 Hash | SHA256 Hash");
+                                foreach (string fileName in fileNames)
+                                {
+                                    String md5hash = GetMd5Hash(fileName);
+                                    String sha256hash = Getsha256Hash(fileName);
+                                    sw.WriteLine($"{fileName} | {md5hash} | {sha256hash}");
+                                }
+                            }
+
                         }
-                        using (SHA256 sha256 = SHA256.Create())
-                        {
-                            // read file
-                            byte[] file = System.IO.File.ReadAllBytes(ofd.FileName);
-                            // generate hash
-                            string sha256hash = Getsha256Hash(sha256, file);
-                            // display hash
-                            tbSha256Hash.Text = sha256hash;
-                        }
+
+
+
+
                     }
                 }
-                /*/else // Begin multiselect files
-                {
-                    string message = "It looks like you selected multiple files.\nThis program is able to multi-generate checksums of the selected files\nand dump them into a file\n\nDo you want to continue?";
-                    string title = "Multiselect found!";
-                    MessageBoxButtons buttons = MessageBoxButtons.YesNo;
-                    DialogResult result = MessageBox.Show(message, title, buttons, MessageBoxIcon.Warning);
-                    if (result == DialogResult.Yes)
-                    {
-                        multiselect = true;
-                        tbMD5Hash.Enabled = false;
-                        tbSha256Hash.Enabled = false;
 
-                        // Add all selected files to list
-                        SelectedFiles[] sf = ofd.FileNames;
-
-                        //create tmp file named "checksumdump.txt"
-                        using (StreamWriter sw = new StreamWriter("checksumdump.txt"))
-                        {
-                            foreach()
-                        }
-                        
-                    }
-                }
-                // no checksum clipboard accordance if multi generation/*/
+                // no checksum clipboard accordance if multi generation/
                 if (multiselect != true)
                 {
 
@@ -103,7 +100,7 @@ namespace checksumGenerator
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 string message = "Error: " + ex;
                 string title = "Fatal Error!";
@@ -112,32 +109,39 @@ namespace checksumGenerator
             }
         }
 
-        private string GetMd5Hash(MD5 md5Hash, byte[] file)
+        private string GetMd5Hash(String filename)
         {
-            // generate MD5 hash by arguments as string
-            byte[] data = md5Hash.ComputeHash(file);
-            // convert byte array to string
-            StringBuilder sBuilder = new StringBuilder();
-            for (int i = 0; i < data.Length; i++)
+            using (MD5 md5 = MD5.Create())
             {
-                sBuilder.Append(data[i].ToString("x2"));
+                byte[] file = System.IO.File.ReadAllBytes(filename);
+                // generate MD5 hash by arguments as string
+                byte[] data = md5.ComputeHash(file);
+                // convert byte array to string
+                StringBuilder sBuilder = new StringBuilder();
+                for (int i = 0; i < data.Length; i++)
+                {
+                    sBuilder.Append(data[i].ToString("x2"));
+                }
+                return sBuilder.ToString();
             }
-            return sBuilder.ToString();
         }
 
 
-        private string Getsha256Hash(SHA256 sha256hash, byte[] file)
+        private string Getsha256Hash(String filename)
         {
-            // generate Sha265 Hash by arguments as string
-            byte[] data = sha256hash.ComputeHash(file);
-            // convert byte array to string
-            StringBuilder sBuilder = new StringBuilder();
-            for (int i = 0; i < data.Length; i++)
+            using (SHA256 sha256 = SHA256.Create())
             {
-                sBuilder.Append(data[i].ToString("x2"));
+                byte[] file = System.IO.File.ReadAllBytes(filename);
+                // generate Sha265 Hash by arguments as string
+                byte[] data = sha256.ComputeHash(file);
+                // convert byte array to string
+                StringBuilder sBuilder = new StringBuilder();
+                for (int i = 0; i < data.Length; i++)
+                {
+                    sBuilder.Append(data[i].ToString("x2"));
+                }
+                return sBuilder.ToString();
             }
-            return sBuilder.ToString();
-
         }
 
         private void btnClose_Click(object sender, EventArgs e)
