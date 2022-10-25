@@ -15,7 +15,7 @@ namespace checksumGenerator
             InitializeComponent();
         }
 
-        public bool multiselect = false;
+        public bool multiselect;
 
         private void btnOpenFile_Click(object sender, EventArgs e)
         {
@@ -24,6 +24,7 @@ namespace checksumGenerator
                 // activate textboxes
                 tbMD5Hash.Enabled = true;
                 tbSha256Hash.Enabled = true;
+                bool multiselect = false;
 
                 // open file dialog
                 OpenFileDialog ofd = new OpenFileDialog();
@@ -53,11 +54,13 @@ namespace checksumGenerator
 
                             // Add all selected files to list
                             String[] fileNames = ofd.FileNames;
-                            if (fileNames.Contains("checksumdump.txt") == true)
-                            {
+                            string dumpfilename = "checksumdump.txt";
+
+                            //if (fileNames.Any(dumpfilename.Contains))
+                            //{
 
                                 //create tmp file named "checksumdump.txt"
-                                using (StreamWriter sw = new StreamWriter("checksumdump.txt"))
+                                using (StreamWriter sw = new StreamWriter(dumpfilename))
                                 {
                                     sw.WriteLine("Filename | MD5 Hash | SHA256 Hash");
                                     foreach (string fileName in fileNames)
@@ -76,19 +79,17 @@ namespace checksumGenerator
                                 if (result == DialogResult.Yes)
                                 {
                                     // open log file with windows notepad
-                                    Process.Start("notepad", "checksumdump.txt");
-                                    tbMD5Hash.Text = "";
-                                    tbSha256Hash.Text = "";
+                                    Process.Start("notepad", dumpfilename);
                                 }
                                 else
                                 {
                                     // Path message
-                                    message = "The file is located under: " + System.IO.Path.GetDirectoryName(Application.ExecutablePath + "checksumdump.txt"); ;
+                                    message = "The file is located under: " + System.IO.Path.GetDirectoryName(Application.ExecutablePath + dumpfilename); ;
                                     title = "Information!";
                                     buttons = MessageBoxButtons.OK;
                                     result = MessageBox.Show(message, title, buttons, MessageBoxIcon.Information);
                                 }
-                            }
+                            /*/}
                             else
                             {
                                 // Error message string list contains dump file
@@ -96,7 +97,10 @@ namespace checksumGenerator
                                 title = "Error!";
                                 buttons = MessageBoxButtons.OK;
                                 result = MessageBox.Show(message, title, buttons, MessageBoxIcon.Error);
-                            }
+                            }/*/
+                            // clear Textboxes
+                            tbMD5Hash.Text = "";
+                            tbSha256Hash.Text = "";
                         }
                     }
                 }
