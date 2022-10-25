@@ -2,6 +2,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Forms;
+using System.IO;
 
 namespace checksumGenerator
 {
@@ -12,54 +13,92 @@ namespace checksumGenerator
             InitializeComponent();
         }
 
+        public bool multiselect = false;
+
         private void btnOpenFile_Click(object sender, EventArgs e)
         {
             try
             {
+                // activate textboxes
+                tbMD5Hash.Enabled = true;
+                tbSha256Hash.Enabled = true;
+
                 // open file dialog
                 OpenFileDialog ofd = new OpenFileDialog();
+                //ofd.Multiselect = true;
                 ofd.Filter = "All files (*.*)|*.*";
                 ofd.Title = "Select a file";
-                if (ofd.ShowDialog() == DialogResult.OK)
+                if (ofd.FileNames.Length == 1)
                 {
-                    using (MD5 md5 = MD5.Create())
+                    if (ofd.ShowDialog() == DialogResult.OK)
                     {
-                        // read file
-                        byte[] file = System.IO.File.ReadAllBytes(ofd.FileName);
-                        // generate hash
-                        string md5hash = GetMd5Hash(md5, file);
-                        // display hash
-                        tbMD5Hash.Text = md5hash;
-                    }
-                    using (SHA256 sha256 = SHA256.Create())
-                    {
-                        // read file
-                        byte[] file = System.IO.File.ReadAllBytes(ofd.FileName);
-                        // generate hash
-                        string sha256hash = Getsha256Hash(sha256, file);
-                        // display hash
-                        tbSha256Hash.Text = sha256hash;
+                        using (MD5 md5 = MD5.Create())
+                        {
+                            // read file
+                            byte[] file = System.IO.File.ReadAllBytes(ofd.FileName);
+                            // generate hash
+                            string md5hash = GetMd5Hash(md5, file);
+                            // display hash
+                            tbMD5Hash.Text = md5hash;
+                        }
+                        using (SHA256 sha256 = SHA256.Create())
+                        {
+                            // read file
+                            byte[] file = System.IO.File.ReadAllBytes(ofd.FileName);
+                            // generate hash
+                            string sha256hash = Getsha256Hash(sha256, file);
+                            // display hash
+                            tbSha256Hash.Text = sha256hash;
+                        }
                     }
                 }
-                // Compare Checksums to clipboard
-                if (Clipboard.ContainsText(TextDataFormat.Text))
+                /*/else // Begin multiselect files
                 {
+                    string message = "It looks like you selected multiple files.\nThis program is able to multi-generate checksums of the selected files\nand dump them into a file\n\nDo you want to continue?";
+                    string title = "Multiselect found!";
+                    MessageBoxButtons buttons = MessageBoxButtons.YesNo;
+                    DialogResult result = MessageBox.Show(message, title, buttons, MessageBoxIcon.Warning);
+                    if (result == DialogResult.Yes)
                     {
-                        string clipboardText = Clipboard.GetText(TextDataFormat.Text);
+                        multiselect = true;
+                        tbMD5Hash.Enabled = false;
+                        tbSha256Hash.Enabled = false;
 
-                        if (clipboardText == tbMD5Hash.Text)
+                        // Add all selected files to list
+                        SelectedFiles[] sf = ofd.FileNames;
+
+                        //create tmp file named "checksumdump.txt"
+                        using (StreamWriter sw = new StreamWriter("checksumdump.txt"))
                         {
-                            string message = "MD5-Hash is eqal to clipboard!";
-                            string title = "Accordance found!";
-                            MessageBoxButtons buttons = MessageBoxButtons.OK;
-                            DialogResult result = MessageBox.Show(message, title, buttons, MessageBoxIcon.Information);
+                            foreach()
                         }
-                        if (clipboardText == tbSha256Hash.Text)
+                        
+                    }
+                }
+                // no checksum clipboard accordance if multi generation/*/
+                if (multiselect != true)
+                {
+
+                    // Compare Checksums to clipboard
+                    if (Clipboard.ContainsText(TextDataFormat.Text))
+                    {
                         {
-                            string message = "SHA256-Hash is eqal to clipboard!";
-                            string title = "Accordance found!";
-                            MessageBoxButtons buttons = MessageBoxButtons.OK;
-                            DialogResult result = MessageBox.Show(message, title, buttons, MessageBoxIcon.Information);
+                            string clipboardText = Clipboard.GetText(TextDataFormat.Text);
+
+                            if (clipboardText == tbMD5Hash.Text)
+                            {
+                                string message = "MD5-Hash is eqal to clipboard!";
+                                string title = "Accordance found!";
+                                MessageBoxButtons buttons = MessageBoxButtons.OK;
+                                DialogResult result = MessageBox.Show(message, title, buttons, MessageBoxIcon.Information);
+                            }
+                            if (clipboardText == tbSha256Hash.Text)
+                            {
+                                string message = "SHA256-Hash is eqal to clipboard!";
+                                string title = "Accordance found!";
+                                MessageBoxButtons buttons = MessageBoxButtons.OK;
+                                DialogResult result = MessageBox.Show(message, title, buttons, MessageBoxIcon.Information);
+                            }
                         }
                     }
                 }
