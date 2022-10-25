@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Forms;
@@ -52,38 +53,49 @@ namespace checksumGenerator
 
                             // Add all selected files to list
                             String[] fileNames = ofd.FileNames;
-
-                            //create tmp file named "checksumdump.txt"
-                            using (StreamWriter sw = new StreamWriter("checksumdump.txt"))
+                            if (fileNames.Contains("checksumdump.txt") == true)
                             {
-                                sw.WriteLine("Filename | MD5 Hash | SHA256 Hash");
-                                foreach (string fileName in fileNames)
+
+                                //create tmp file named "checksumdump.txt"
+                                using (StreamWriter sw = new StreamWriter("checksumdump.txt"))
                                 {
-                                    String md5hash = GetMd5Hash(fileName);
-                                    String sha256hash = Getsha256Hash(fileName);
-                                    sw.WriteLine($"{fileName} | {md5hash} | {sha256hash}");
+                                    sw.WriteLine("Filename | MD5 Hash | SHA256 Hash");
+                                    foreach (string fileName in fileNames)
+                                    {
+                                        String md5hash = GetMd5Hash(fileName);
+                                        String sha256hash = Getsha256Hash(fileName);
+                                        sw.WriteLine($"{fileName} | {md5hash} | {sha256hash}");
+                                    }
                                 }
-                            }
 
-                            // Done message
-                            message = "Done!\n\nDo you want to open the file?";
-                            title = "Task Done!";
-                            buttons = MessageBoxButtons.YesNo;
-                            result = MessageBox.Show(message, title, buttons, MessageBoxIcon.Question);
-                            if(result == DialogResult.Yes)
-                            {
-                                // open log file with windows notepad
-                                Process.Start("notepad", "checksumdump.txt");
-                                tbMD5Hash.Text = "";
-                                tbSha256Hash.Text = "";
+                                // Done message
+                                message = "Done!\n\nDo you want to open the file?";
+                                title = "Task Done!";
+                                buttons = MessageBoxButtons.YesNo;
+                                result = MessageBox.Show(message, title, buttons, MessageBoxIcon.Question);
+                                if (result == DialogResult.Yes)
+                                {
+                                    // open log file with windows notepad
+                                    Process.Start("notepad", "checksumdump.txt");
+                                    tbMD5Hash.Text = "";
+                                    tbSha256Hash.Text = "";
+                                }
+                                else
+                                {
+                                    // Path message
+                                    message = "The file is located under: " + System.IO.Path.GetDirectoryName(Application.ExecutablePath + "checksumdump.txt"); ;
+                                    title = "Information!";
+                                    buttons = MessageBoxButtons.OK;
+                                    result = MessageBox.Show(message, title, buttons, MessageBoxIcon.Information);
+                                }
                             }
                             else
                             {
-                                // Path message
-                                message = "The file is located under: " + System.IO.Path.GetDirectoryName(Application.ExecutablePath + "checksumdump.txt"); ;
-                                title = "Information!";
+                                // Error message string list contains dump file
+                                message = "Your selected files contains the checksum dump file!\n\nUnselect and try again.";
+                                title = "Error!";
                                 buttons = MessageBoxButtons.OK;
-                                result = MessageBox.Show(message, title, buttons, MessageBoxIcon.Information);
+                                result = MessageBox.Show(message, title, buttons, MessageBoxIcon.Error);
                             }
                         }
                     }
