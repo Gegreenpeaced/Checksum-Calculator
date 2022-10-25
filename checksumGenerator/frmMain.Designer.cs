@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             this.lblMD5Checksum = new System.Windows.Forms.Label();
             this.ofdMD5Checksum = new System.Windows.Forms.OpenFileDialog();
             this.btnOpenFile = new System.Windows.Forms.Button();
@@ -115,6 +116,7 @@
             this.Controls.Add(this.tbMD5Hash);
             this.Controls.Add(this.btnOpenFile);
             this.Controls.Add(this.lblMD5Checksum);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "frmMain";
             this.Text = "Hauptformular";
             this.ResumeLayout(false);
