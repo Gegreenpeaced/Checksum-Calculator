@@ -68,10 +68,11 @@
             this.btnOpenFile.TabIndex = 1;
             this.btnOpenFile.Text = "Datei(en) öffnen";
             this.btnOpenFile.UseVisualStyleBackColor = true;
+            this.btnOpenFile.Click += new System.EventHandler(this.btnOpenFile_Click);
             // 
             // tbMD5Hash
             // 
-            this.tbMD5Hash.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.tbMD5Hash.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbMD5Hash.Location = new System.Drawing.Point(123, 114);
             this.tbMD5Hash.Name = "tbMD5Hash";
@@ -89,7 +90,7 @@
             // 
             // tbSha256Hash
             // 
-            this.tbSha256Hash.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.tbSha256Hash.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbSha256Hash.Location = new System.Drawing.Point(123, 140);
             this.tbSha256Hash.Name = "tbSha256Hash";
@@ -118,7 +119,7 @@
             // 
             // tbSha1Hash
             // 
-            this.tbSha1Hash.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.tbSha1Hash.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbSha1Hash.Location = new System.Drawing.Point(123, 166);
             this.tbSha1Hash.Name = "tbSha1Hash";
@@ -127,7 +128,7 @@
             // 
             // tbFilePathOrString
             // 
-            this.tbFilePathOrString.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.tbFilePathOrString.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbFilePathOrString.Location = new System.Drawing.Point(123, 17);
             this.tbFilePathOrString.Name = "tbFilePathOrString";
@@ -146,7 +147,7 @@
             // 
             // tbCR32Hash
             // 
-            this.tbCR32Hash.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.tbCR32Hash.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tbCR32Hash.Location = new System.Drawing.Point(123, 88);
             this.tbCR32Hash.Name = "tbCR32Hash";
@@ -164,7 +165,7 @@
             // 
             // cbEncoding
             // 
-            this.cbEncoding.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.cbEncoding.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cbEncoding.FormattingEnabled = true;
             this.cbEncoding.Items.AddRange(new object[] {
