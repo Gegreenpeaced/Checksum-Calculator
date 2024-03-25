@@ -15,7 +15,6 @@ namespace checksumGenerator
         // Pub Vars
         public bool multiselect;
 
-
         public frmMain()
         {
             InitializeComponent();
@@ -68,8 +67,6 @@ namespace checksumGenerator
         }
 
         // CalcChecksums
-
-        /// ADD Encoding Parameter
         private string[] CalcChecksums(bool isPath, string pathOrString)
         {
             if (isPath)
@@ -81,8 +78,6 @@ namespace checksumGenerator
             // isPath = 0
             else
             {
-                /// ADD Multithreading
-                /// 
                 // Get Encoding Type
                 string encoding;
                 switch (cbEncoding.SelectedIndex)
@@ -274,12 +269,15 @@ namespace checksumGenerator
         {
             try
             {
+                // Clear FilePath Or String Textbox
+                tbFilePathOrString.Text = "";
+
                 // activate textboxes
                 tbCR32Hash.Enabled = true;
                 tbMD5Hash.Enabled = true;
                 tbSha256Hash.Enabled = true;
                 tbSha1Hash.Enabled = true;
-                bool multiselect = false;
+                multiselect = false;
 
                 // open file dialog
                 OpenFileDialog ofd = new OpenFileDialog();
@@ -290,14 +288,8 @@ namespace checksumGenerator
                 {
                     if (ofd.FileNames.Length == 1)
                     {
-                        tbCR32Hash.Text = "N/A";
-
-                        tbMD5Hash.Text = CalcMD5HashFile(ofd.FileName);
-
-                        tbSha256Hash.Text = CalcSHA256HashFile(ofd.FileName);
-
-                        tbSha1Hash.Text = CalcSHA1HashFile(ofd.FileName);
-
+                        // Past Path in TB Field
+                        tbFilePathOrString.Text = ofd.FileNames[0];
                     }
                     else // Begin multiselect files
                     {
