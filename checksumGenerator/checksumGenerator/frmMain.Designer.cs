@@ -68,7 +68,7 @@
             this.btnOpenFile.TabIndex = 1;
             this.btnOpenFile.Text = "Datei(en) öffnen";
             this.btnOpenFile.UseVisualStyleBackColor = true;
-            this.btnOpenFile.Click += new System.EventHandler(this.btnOpenFile_Click);
+            //this.btnOpenFile.Click += new System.EventHandler(this.btnOpenFile_Click);
             // 
             // tbMD5Hash
             // 

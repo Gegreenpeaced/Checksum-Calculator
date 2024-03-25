@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Drawing.Text;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -15,6 +16,13 @@ namespace checksumGenerator
         // Pub Vars
         public bool multiselect;
 
+        // Invoke Delegate Method
+        private delegate void SetFrmTitleThreadSafe(string text);
+        private delegate void SetCR32TBThreadSafe(string CR32Hash);
+        private delegate void SetMD5TBThreadSafe(string MD5Hash);
+        private delegate void SetSHA1TBThreadSafe(string SHA1Hash);
+        private delegate void SetSHA256TBThreadSafe(string SHA256Hash);
+
 
         public frmMain()
         {
@@ -28,7 +36,9 @@ namespace checksumGenerator
         private void tbFilePathOrString_TextChanged(object sender, EventArgs e)
         {
             string pathOrString = tbFilePathOrString.Text;
-            string[] resultSum;
+            // Start Task for Calculation
+
+
             if (File.Exists(tbFilePathOrString.Text))
             {
                 // Ask if FileChecksum is wanted
@@ -38,81 +48,106 @@ namespace checksumGenerator
                 DialogResult result = MessageBox.Show(message, title, buttons, MessageBoxIcon.Question);
                 if (result == DialogResult.Yes)
                 {
-                    // Get File Checksum
-                    resultSum = CalcChecksums(true, pathOrString);
+                    // Initalise new Task
+                    Task TCalcChecksums = new Task(() => CalcChecksums(true, pathOrString));
+                    // Start Task
+                    TCalcChecksums.Start();
+                    // Await Task Result
+                    TCalcChecksums.Wait();
+                    Console.WriteLine("Berechnung Abgeschlossen!");
                 }
                 else
                 {
-                    // Get String Checksum
-                    resultSum = CalcChecksums(false, pathOrString);
+                    // Initalise new Task
+                    Task TCalcChecksums = new Task(() => CalcChecksums(false, pathOrString));
+                    // Start Task
+                    TCalcChecksums.Start();
+                    // Await Task Result
+                    TCalcChecksums.Wait();
+                    Console.WriteLine("Berechnung Abgeschlossen!");
                 }
             }
             else
             {
-                resultSum = CalcChecksums(false, pathOrString);
+                // Initalise new Task
+                Task TCalcChecksums = new Task(() => CalcChecksums(false, pathOrString));
+                // Start Task
+                TCalcChecksums.Start();
+                // Await Task Result
+                TCalcChecksums.Wait();
+                Console.WriteLine("Berechnung Abgeschlossen!");
 
             }
-
-            // Update Textboxes
-            tbCR32Hash.Text = resultSum[0];
-            tbMD5Hash.Text = resultSum[1];
-            tbSha1Hash.Text = resultSum[2];
-            tbSha256Hash.Text = resultSum[3];
-
-            // Check for Clipboard Accordance
-            if (!multiselect)
-            {
-                CheckClipboardAccordance();
-            }
-
         }
 
         // CalcChecksums
-
-        /// ADD Encoding Parameter
-        private string[] CalcChecksums(bool isPath, string pathOrString)
+        private async void CalcChecksums(bool isPath, string pathOrString)
         {
+            // Check if Text is Path
             if (isPath)
             {
-                string[] returnstring = { CalcCR32HashFile(pathOrString), CalcMD5HashFile(pathOrString), CalcSHA1HashFile(pathOrString), CalcSHA256HashFile(pathOrString) };
+                // Mark Frm Tilte as Checksum for File
                 this.Text = "Hauptformular - Prüfsumme: Datei!";
-                return returnstring;
+
+                // Calc CR32 Hash File in Thread
+                Task<string> TCalcCR32HashFile = CalcCR32HashFile(pathOrString);
+
+                // Calc MD5 Hash File in Thread
+                Task<string> TCalcMD5HashFile = CalcMD5HashFile(pathOrString);
+
+                // Calc SHA1 Hash File in Thread
+                Task<string> TCalcSHA1HashFile = CalcSHA1HashFile(pathOrString);
+
+                // Calc SHA256 Hash File in Thread
+                Task<string> TCalcSHA256HashFile = CalcSHA256HashFile(pathOrString);
+
+                // Await Results
+                string MD5Sum = await TCalcMD5HashFile;
+                string SHA1Sum = await TCalcSHA1HashFile;
+                string SHA256Sum = await TCalcSHA256HashFile;
+                string CR32Sum = await TCalcCR32HashFile;
+
+                // Set Textboxes
+                SetTextbox(CR32Sum, MD5Sum, SHA1Sum, SHA256Sum);
+
+                // Check for Clipboard Accordance
+                if (!multiselect) { CheckClipboardAccordance(); }
+
             }
             // isPath = 0
             else
             {
-                /// ADD Multithreading
-                /// 
+                
                 // Get Encoding Type
-                string encoding;
-                switch (cbEncoding.SelectedIndex)
-                {
-                    default:
-                        {
-                            encoding = "ASCII";
-                            break;
-                        }
-                    case 1:
-                        {
-                            encoding = "Unicode";
-                            break;
-                        }
-                    case 2:
-                        {
-                            encoding = "UTF8";
-                            break;
-                        }
-                    case 3:
-                        {
-                            encoding = "UTF16";
-                            break;
-                        }
-                }
+                int encoding = 0;  //cbEncoding.SelectedIndex;
 
-                // Build String
-                string[] returnstring = { CalcCR32HashString(pathOrString, encoding), CalcMD5HashString(pathOrString, encoding), CalcSHA1HashString(pathOrString, encoding), CalcSHA256HashString(pathOrString, encoding) };
-                this.Text = "Hauptformular - Prüfsumme: String!";
-                return returnstring;
+                // Mark as Checksum for String
+                this.Text = "Hauptformular - Prüfsumme: Zeichenkette!";
+                
+
+                // Calc CR32 Hash File in Thread
+                Task<string> TCalcCR32HashFile = CalcCR32HashString(pathOrString, encoding);
+
+                // Calc MD5 Hash File in Thread
+                Task<string> TCalcMD5HashFile = CalcMD5HashString(pathOrString, encoding);
+
+                // Calc SHA1 Hash File in Thread
+                Task<string> TCalcSHA1HashFile = CalcSHA1HashString(pathOrString, encoding);
+
+                // Calc SHA256 Hash File in Thread
+                Task<string> TCalcSHA256HashFile = CalcSHA256HashString(pathOrString, encoding);
+
+                // Await Results
+                string MD5Sum = await TCalcMD5HashFile;
+                string SHA1Sum = await TCalcSHA1HashFile;
+                string SHA256Sum = await TCalcSHA256HashFile;
+                string CR32Sum = await TCalcCR32HashFile;
+
+                // Set Textboxes
+                SetTextbox(CR32Sum, MD5Sum, SHA1Sum, SHA256Sum);
+
+                // Check for Clipboard Accordance
+                if (!multiselect) { CheckClipboardAccordance(); }
             }
         }
 
@@ -155,14 +190,26 @@ namespace checksumGenerator
                 }
             }
         }
+        // Set Textboxes
+        private void SetTextbox(string CR32Sum, string MD5Sum, string SHA1Sum, string SHA256Sum)
+        {
+            // Set Textboxes
+            tbCR32Hash.Text = CR32Sum;
+            tbMD5Hash.Text = MD5Sum;
+            tbSha1Hash.Text = SHA1Sum;
+            tbSha256Hash.Text = SHA256Sum;
+        }
+
+
 
         // Calc Methods String
         // ADD Encoding Option
-        private string CalcCR32HashString(string String, string encodingType)
+        private async Task<string> CalcCR32HashString(string String, int encodingType)
         {
-            return "N/A";
+            string s = "N/A";
+            return await Task<string>.FromResult(s);
         }
-        private string CalcMD5HashString(string String, string encodingType)
+        private async Task<string> CalcMD5HashString(string String, int encodingType)
         {
             using (MD5 md5 = MD5.Create())
             {
@@ -175,17 +222,17 @@ namespace checksumGenerator
                             bytestring = Encoding.ASCII.GetBytes(String);
                             break;
                         }
-                    case ("Unicode"):
+                    case (1):
                         {
                             bytestring = Encoding.Unicode.GetBytes(String);
                             break;
                         }
-                    case ("UTF8"):
+                    case (2):
                         {
                             bytestring = Encoding.UTF8.GetBytes(String);
                             break;
                         }
-                    case ("UTF32"):
+                    case (3):
                         {
                             bytestring = Encoding.UTF32.GetBytes(String);
                             break;
@@ -199,10 +246,11 @@ namespace checksumGenerator
                 {
                     sBuilder.Append(data[i].ToString("x2"));
                 }
-                return sBuilder.ToString();
+                string s = sBuilder.ToString();
+                return await Task<string>.FromResult(s);
             }
         }
-        private string CalcSHA1HashString(string String, string encodingType)
+        private async Task<string> CalcSHA1HashString(string String, int encodingType)
         {
             using (SHA1 sha1 = SHA1.Create())
             {
@@ -215,17 +263,17 @@ namespace checksumGenerator
                             bytestring = Encoding.ASCII.GetBytes(String);
                             break;
                         }
-                    case ("Unicode"):
+                    case (1):
                         {
                             bytestring = Encoding.Unicode.GetBytes(String);
                             break;
                         }
-                    case ("UTF8"):
+                    case (2):
                         {
                             bytestring = Encoding.UTF8.GetBytes(String);
                             break;
                         }
-                    case ("UTF32"):
+                    case (3):
                         {
                             bytestring = Encoding.UTF32.GetBytes(String);
                             break;
@@ -239,10 +287,11 @@ namespace checksumGenerator
                 {
                     sBuilder.Append(data[i].ToString("x2"));
                 }
-                return sBuilder.ToString();
+                string s = sBuilder.ToString();
+                return await Task<string>.FromResult(s);
             }
         }
-        private string CalcSHA256HashString(string String, string encodingType)
+        private async Task<string> CalcSHA256HashString(string String, int encodingType)
         {
             using (SHA256 sha256 = SHA256.Create())
             {
@@ -255,17 +304,17 @@ namespace checksumGenerator
                             bytestring = Encoding.ASCII.GetBytes(String);
                             break;
                         }
-                    case ("Unicode"):
+                    case (1):
                         {
                             bytestring = Encoding.Unicode.GetBytes(String);
                             break;
                         }
-                    case ("UTF8"):
+                    case (2):
                         {
                             bytestring = Encoding.UTF8.GetBytes(String);
                             break;
                         }
-                    case ("UTF32"):
+                    case (3):
                         {
                             bytestring = Encoding.UTF32.GetBytes(String);
                             break;
@@ -279,16 +328,18 @@ namespace checksumGenerator
                 {
                     sBuilder.Append(data[i].ToString("x2"));
                 }
-                return sBuilder.ToString();
+                string s = sBuilder.ToString();
+                return await Task<string>.FromResult(s);
             }
         }
 
         // Calc Methods File
-        private string CalcCR32HashFile(string filename)
+        private async Task<string> CalcCR32HashFile(string filename)
         {
-            return "N/A";
+            string s = "N/A";
+            return await Task<string>.FromResult(s);
         }
-        private string CalcMD5HashFile(string filename)
+        private async Task<string> CalcMD5HashFile(string filename)
         {
             using (MD5 md5 = MD5.Create())
             {
@@ -301,10 +352,11 @@ namespace checksumGenerator
                 {
                     sBuilder.Append(data[i].ToString("x2"));
                 }
-                return sBuilder.ToString();
+                string s = sBuilder.ToString();
+                return await Task<string>.FromResult(s);
             }
         }
-        private string CalcSHA1HashFile(string filename)
+        private async Task<string> CalcSHA1HashFile(string filename)
         {
             using (SHA1 sha1 = SHA1.Create())
             {
@@ -317,10 +369,11 @@ namespace checksumGenerator
                 {
                     sBuilder.Append(data[i].ToString("x2"));
                 }
-                return sBuilder.ToString();
+                string s = sBuilder.ToString();
+                return await Task<string>.FromResult(s);
             }
         }
-        private string CalcSHA256HashFile(string filename)
+        private async Task<string> CalcSHA256HashFile(string filename)
         {
             using (SHA256 sha256 = SHA256.Create())
             {
@@ -333,13 +386,14 @@ namespace checksumGenerator
                 {
                     sBuilder.Append(data[i].ToString("x2"));
                 }
-                return sBuilder.ToString();
+                string s = sBuilder.ToString();
+                return await Task<string>.FromResult(s);
             }
         }
 
 
         // Multiselect
-        private void btnOpenFile_Click(object sender, EventArgs e)
+        /*private void btnOpenFile_Click(object sender, EventArgs e)
         {
             try
             {
@@ -445,7 +499,7 @@ namespace checksumGenerator
                 MessageBoxButtons buttons = MessageBoxButtons.OK;
                 DialogResult result = MessageBox.Show(message, title, buttons, MessageBoxIcon.Error);
             }
-        }
+        }*/
 
         private void btnClose_Click(object sender, EventArgs e)
         {
