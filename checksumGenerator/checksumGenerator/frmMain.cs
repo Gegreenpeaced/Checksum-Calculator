@@ -167,7 +167,30 @@ namespace checksumGenerator
             using (MD5 md5 = MD5.Create())
             {
                 // Calc Byte from String
-                byte[] bytestring = Encoding.ASCII.GetBytes(String);
+                byte[] bytestring;
+                switch (encodingType)
+                {
+                    default: // ASCII
+                        {
+                            bytestring = Encoding.ASCII.GetBytes(String);
+                            break;
+                        }
+                    case ("Unicode"):
+                        {
+                            bytestring = Encoding.Unicode.GetBytes(String);
+                            break;
+                        }
+                    case ("UTF8"):
+                        {
+                            bytestring = Encoding.UTF8.GetBytes(String);
+                            break;
+                        }
+                    case ("UTF32"):
+                        {
+                            bytestring = Encoding.UTF32.GetBytes(String);
+                            break;
+                        }
+                }
                 // generate MD5 hash by arguments as string
                 byte[] data = md5.ComputeHash(bytestring);
                 // convert byte array to string
@@ -184,7 +207,30 @@ namespace checksumGenerator
             using (SHA1 sha1 = SHA1.Create())
             {
                 // Calc Byte from String
-                byte[] bytestring = Encoding.ASCII.GetBytes(String);
+                byte[] bytestring;
+                switch (encodingType)
+                {
+                    default: // ASCII
+                        {
+                            bytestring = Encoding.ASCII.GetBytes(String);
+                            break;
+                        }
+                    case ("Unicode"):
+                        {
+                            bytestring = Encoding.Unicode.GetBytes(String);
+                            break;
+                        }
+                    case ("UTF8"):
+                        {
+                            bytestring = Encoding.UTF8.GetBytes(String);
+                            break;
+                        }
+                    case ("UTF32"):
+                        {
+                            bytestring = Encoding.UTF32.GetBytes(String);
+                            break;
+                        }
+                }
                 // generate M5 hash by arguments as string
                 byte[] data = sha1.ComputeHash(bytestring);
                 // convert byte array to string
@@ -201,7 +247,30 @@ namespace checksumGenerator
             using (SHA256 sha256 = SHA256.Create())
             {
                 // Calc Byte from String
-                byte[] bytestring = Encoding.ASCII.GetBytes(String);
+                byte[] bytestring;
+                switch (encodingType)
+                {
+                    default: // ASCII
+                        {
+                            bytestring = Encoding.ASCII.GetBytes(String);
+                            break;
+                        }
+                    case ("Unicode"):
+                        {
+                            bytestring = Encoding.Unicode.GetBytes(String);
+                            break;
+                        }
+                    case ("UTF8"):
+                        {
+                            bytestring = Encoding.UTF8.GetBytes(String);
+                            break;
+                        }
+                    case ("UTF32"):
+                        {
+                            bytestring = Encoding.UTF32.GetBytes(String);
+                            break;
+                        }
+                }
                 // generate Sha265 Hash by arguments as string
                 byte[] data = sha256.ComputeHash(bytestring);
                 // convert byte array to string
@@ -279,7 +348,7 @@ namespace checksumGenerator
                 tbMD5Hash.Enabled = true;
                 tbSha256Hash.Enabled = true;
                 tbSha1Hash.Enabled = true;
-                bool multiselect = false;
+                multiselect = false;
 
                 // open file dialog
                 OpenFileDialog ofd = new OpenFileDialog();
