@@ -26,44 +26,54 @@ namespace checksumGenerator
         // On Update Method
         private void tbFilePathOrString_TextChanged(object sender, EventArgs e)
         {
-            string pathOrString = tbFilePathOrString.Text;
-            string[] resultSum;
-            if (File.Exists(tbFilePathOrString.Text))
+            try
             {
-                // Ask if FileChecksum is wanted
-                string message = "Looks like you selected a file.\nDo you want the Checksum of the selected file?";
-                string title = "Filepath found!";
-                MessageBoxButtons buttons = MessageBoxButtons.YesNo;
-                DialogResult result = MessageBox.Show(message, title, buttons, MessageBoxIcon.Question);
-                if (result == DialogResult.Yes)
+                string pathOrString = tbFilePathOrString.Text;
+                string[] resultSum;
+                if (File.Exists(tbFilePathOrString.Text))
                 {
-                    // Get File Checksum
-                    resultSum = CalcChecksums(true, pathOrString);
+                    // Ask if FileChecksum is wanted
+                    string message = "Looks like you selected a file.\nDo you want the Checksum of the selected file?";
+                    string title = "Filepath found!";
+                    MessageBoxButtons buttons = MessageBoxButtons.YesNo;
+                    DialogResult result = MessageBox.Show(message, title, buttons, MessageBoxIcon.Question);
+                    if (result == DialogResult.Yes)
+                    {
+                        // Get File Checksum
+                        resultSum = CalcChecksums(true, pathOrString);
+                    }
+                    else
+                    {
+                        // Get String Checksum
+                        resultSum = CalcChecksums(false, pathOrString);
+                    }
                 }
                 else
                 {
-                    // Get String Checksum
                     resultSum = CalcChecksums(false, pathOrString);
+
                 }
+
+                // Update Textboxes
+                tbCR32Hash.Text = resultSum[0];
+                tbMD5Hash.Text = resultSum[1];
+                tbSha1Hash.Text = resultSum[2];
+                tbSha256Hash.Text = resultSum[3];
+
+                // Check for Clipboard Accordance
+                if (!multiselect)
+                {
+                    CheckClipboardAccordance();
+                }
+
             }
-            else
+            catch(Exception ex)
             {
-                resultSum = CalcChecksums(false, pathOrString);
-
+                string message = "Error: " + ex;
+                string title = "Fatal Error!";
+                MessageBoxButtons buttons = MessageBoxButtons.OK;
+                DialogResult result = MessageBox.Show(message, title, buttons, MessageBoxIcon.Error);
             }
-
-            // Update Textboxes
-            tbCR32Hash.Text = resultSum[0];
-            tbMD5Hash.Text = resultSum[1];
-            tbSha1Hash.Text = resultSum[2];
-            tbSha256Hash.Text = resultSum[3];
-
-            // Check for Clipboard Accordance
-            if (!multiselect)
-            {
-                CheckClipboardAccordance();
-            }
-
         }
 
         // CalcChecksums
